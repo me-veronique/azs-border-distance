@@ -1,28 +1,23 @@
-# AZS–Border Distance (Python)
+# AZS–Border Distance
 
-Compute the geodesic distance from each fuel station (AZS) to the nearest **international border** and export a CSV for analytics (e.g., near-border share, unique border stations, cross-border patterns).
+**Goal:** for customer behavior analysis, I needed to compute the distance from each fuel station (AZS) to the **nearest international border** using station geo-coordinates.
 
-**Stack:** Python, GeoPandas, Shapely, PyProj, (optional) PyOgrio.  
-**Output:** CSV with `azsCode` and `DistanceToBoarder` (km).
+**What the script does**
+1) Loads country border geometries from **GeoJSON/JSON** files.  
+2) Builds a unified border line.  
+3) For every station, finds the nearest point on that line and computes a **geodesic** distance (km).  
+Result is saved to CSV with a new column `DistanceToBoarder` (km).
 
----
-
-## ✨ What it does
-1. Loads **GADM L0** country polygons (GeoPackage/GeoJSON/Shapefile).
-2. Merges per-country geometries, snaps adjacent borders, and builds a robust **international border line**.
-3. Reads AZS catalog (CSV/Excel) with coordinates.
-4. For each AZS:
-   - finds the nearest point on the border line (in EPSG:3035),
-   - computes **geodesic distance** on WGS84 (PyProj.Geod),
-   - writes `DistanceToBoarder` (km, rounded).
-
-> Keeps the exact column name `DistanceToBoarder` to match existing downstream logic.
+**Libraries**
+- Python, **pandas**, **GeoPandas**, **Shapely**, **PyProj** (optionally **pyogrio** for fast I/O).
 
 ---
 
-## 🔧 Installation
-
-### Option A — conda (recommended on Windows)
+## How to run (simple)
 ```bash
-conda env create -f environment.yml
-conda activate azs-border-distance
+pip install -r requirements.txt
+python -m src.azs_border_distance \
+  --borders-dir "C:/data/GADM_CountryBorders_L0" \
+  --azs-file    "C:/data/ouoAzs2.csv" \
+  --out         "C:/data/ouoAzs2_with_distance.csv"
+
